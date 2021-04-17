@@ -7,32 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>882</width>
-    <height>636</height>
+    <height>515</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="pB_selectfile">
-    <property name="geometry">
-     <rect>
-      <x>640</x>
-      <y>80</y>
-      <width>171</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>选择文件</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="pB_encryption">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>410</y>
-      <width>291</width>
+      <x>180</x>
+      <y>400</y>
+      <width>141</width>
       <height>41</height>
      </rect>
     </property>
@@ -40,51 +27,164 @@
      <string>加密</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>160</y>
-      <width>71</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>输入口令</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_filepath">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>80</y>
-      <width>551</width>
-      <height>41</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QTextEdit" name="textEdit_passwd">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>200</y>
-      <width>471</width>
-      <height>151</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QPushButton" name="pB_decryption">
     <property name="geometry">
      <rect>
-      <x>460</x>
-      <y>410</y>
-      <width>291</width>
+      <x>510</x>
+      <y>400</y>
+      <width>161</width>
       <height>41</height>
      </rect>
     </property>
     <property name="text">
      <string>解密</string>
     </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>841</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>文件</string>
+    </property>
+    <widget class="QPushButton" name="pB_selectfile">
+     <property name="geometry">
+      <rect>
+       <x>670</x>
+       <y>20</y>
+       <width>141</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>选择文件</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEdit_filepath">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>20</y>
+       <width>631</width>
+       <height>41</height>
+      </rect>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>120</y>
+      <width>671</width>
+      <height>241</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>口令</string>
+    </property>
+    <widget class="QPushButton" name="pB_savepasswd">
+     <property name="geometry">
+      <rect>
+       <x>540</x>
+       <y>200</y>
+       <width>111</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>保存到文件中</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pB_passwdfile">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>30</y>
+       <width>111</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>选择加密文件</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cB_usepasswdfile">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>40</y>
+       <width>111</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>使用加密文件</string>
+     </property>
+    </widget>
+    <widget class="QTextEdit" name="textEdit_passwd">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>60</y>
+       <width>631</width>
+       <height>131</height>
+      </rect>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_3">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>130</y>
+      <width>161</width>
+      <height>231</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>模式</string>
+    </property>
+    <widget class="QComboBox" name="cB_mode">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>110</y>
+       <width>91</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>ECB</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>CBC</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>CFB</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>OFB</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>CTR</string>
+      </property>
+     </item>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

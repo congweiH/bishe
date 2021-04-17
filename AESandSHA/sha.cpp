@@ -12,7 +12,6 @@ void SHA::sha1(QString passwd, word res[])
     // 1. 消息填充
     extend(passwd);
 
-//    cout << p.size() << endl;
     word H[5] = { 0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0};
 
     for(int i = 0; i < p.size(); i += 64){
@@ -25,10 +24,6 @@ void SHA::sha1(QString passwd, word res[])
     for(int i = 0; i < 5; i++){
         res[i] = H[i];
     }
-    //    cout << "最后结果" << endl;
-    //    for(int i = 0; i < 5; i++){
-    //        cout << H[i] << endl;
-    //    }
 
     cout << "sha-1 result:" << endl;
     cout<<setw(8)<< setfill('0')<<hex<<H[0].to_ulong();
@@ -53,11 +48,9 @@ void SHA::extend(QString passwd)
     // 填充1000 0000 这个是必须要填充的
     p.push_back(128); // 128 对应 1000 0000
 
-//    cout << p.size() << endl;
     while(p.size() * 8 % 512 != 448){
         p.push_back(0);   // 后面填充0
     }
-//    cout << p.size() << endl;
 
     // 填充长度，占64位, 8个字节
     bitset<64> t = len * 8;
@@ -67,10 +60,7 @@ void SHA::extend(QString passwd)
     for(int i = 0; i < 8;i++){
         p.push_back(res[i]);
     }
-//    cout << p.size() << endl;
-//    for(int i = 0; i < p.size(); i++){
-//        cout << p[i] << endl;
-//    }
+
 }
 word SHA::S(word x, int n)
 {
@@ -109,11 +99,9 @@ void SHA::createW(int start)
 {
     // 分成16份子明文分组，每一份32个字节
     int len = 0;
-    for(int j = start; j < start+64; j += 4)
-        M[len++] = Word(p[j], p[j+1], p[j+2], p[j+3]);
-//    for(int i =0;i<16;i++){
-//        cout << M[i] << endl;
-//    }
+    for(int j = start; j < start+64; j += 4){
+        M[len++] = Manager::Word(p[j], p[j+1], p[j+2], p[j+3]);
+    }
 
     for(int t = 0; t < 16; t++){
         W[t] = M[t];
@@ -166,23 +154,6 @@ void SHA::Do(word H[5])
 
 }
 
-void SHA::slip(word t, byte & a, byte & b, byte &c, byte & d)
-{
-    int len = 0;
-    for(int i=0; i < 8; i++){
-        d[i] = t[len++];
-    }
-    for(int i=0; i< 8; i++){
-        c[i] = t[len++];
-    }
-    for(int i=0; i< 8; i++){
-        b[i] = t[len++];
-    }
-    for(int i=0; i< 8; i++){
-        a[i] = t[len++];
-    }
-}
-
 void SHA::slip(bitset<64> t, byte res[8])
 {
     int p = 0;
@@ -193,21 +164,3 @@ void SHA::slip(bitset<64> t, byte res[8])
     }
 }
 
-word SHA::Word(byte a, byte b, byte c, byte d)
-{
-    word t;
-    int len = 0;
-    for(int i = 0; i < 8; i++){
-        t[len++] = d[i];
-    }
-    for(int i = 0; i < 8; i++){
-        t[len++] = c[i];
-    }
-    for(int i = 0; i < 8; i++){
-        t[len++] = b[i];
-    }
-    for(int i = 0; i < 8; i++){
-        t[len++] = a[i];
-    }
-    return t;
-}

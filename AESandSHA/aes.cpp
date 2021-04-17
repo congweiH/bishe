@@ -11,7 +11,7 @@ void AES::keyExpansion()
 {
     // 将初始密码每一列都转换成一个字 得出 w[0], w[1], w[2], w[3]
     for(int i = 0; i < 4; i++){
-        w[i] = Word(key[4*i], key[4*i+1], key[4*i+2], key[4*i+3]);
+        w[i] = Manager::Word(Manager::key[4*i], Manager::key[4*i+1], Manager::key[4*i+2], Manager::key[4*i+3]);
     }
     // 扩充40个新列，总共构成44列, j代表第几轮
     for(int i = 4; i < 44; i++){
@@ -21,10 +21,6 @@ void AES::keyExpansion()
         }
         w[i] = w[i-4] ^ temp;
     }
-
-//    for(int i = 0; i < 44; i++){
-//        cout << w[i] << endl;
-//    }
 }
 /*
  * 对word中每一个字进行S盒变换
@@ -32,13 +28,13 @@ void AES::keyExpansion()
 word AES::SubWord(word t)
 {
     byte a[4];
-    slip(t, a[0], a[1], a[2], a[3]);
+    Manager::slip(t, a[0], a[1], a[2], a[3]);
 
     for(int i = 0; i < 4; i++){
         a[i] = SubByte(a[i]);
     }
     // 将4个字节组成1个字
-    return Word(a[0], a[1], a[2], a[3]);
+    return Manager::Word(a[0], a[1], a[2], a[3]);
 }
 byte AES::SubByte(byte t)
 {
@@ -63,20 +59,20 @@ byte AES::SubByte1(byte t)
 word AES::RotWord(word t)
 {
     byte a[4];
-    slip(t, a[0], a[1], a[2], a[3]);
-    return Word(a[1], a[2], a[3], a[0]);
+    Manager::slip(t, a[0], a[1], a[2], a[3]);
+    return Manager::Word(a[1], a[2], a[3], a[0]);
 }
 
 word AES::RotWord1(word t)
 {
     byte a[4];
-    slip(t, a[0], a[1], a[2], a[3]);
-    return Word(a[3], a[0], a[1], a[2]);
+    Manager::slip(t, a[0], a[1], a[2], a[3]);
+    return Manager::Word(a[3], a[0], a[1], a[2]);
 }
 /*
  * 加密一组的过程
  */
-void AES::Do(byte state[4][4])
+void AES::block_en(byte state[4][4])
 {
     //  轮密钥加 w[0, 3]
     addRoundKey(state, 0);
@@ -101,7 +97,7 @@ void AES::Do(byte state[4][4])
 /*
  * 一组的解密
  */
-void AES::Do1(byte state[4][4])
+void AES::block_de(byte state[4][4])
 {
     addRoundKey(state, 40);
     // 前 9 次
@@ -129,7 +125,7 @@ void AES::addRoundKey(byte state[4][4], int start)
     // 一共4列
     for(int i = 0; i < 4; i++){
         // state第i列与 w 第i个字异或
-        slip(w[start+i], a[0], a[1], a[2], a[3]);
+        Manager::slip(w[start+i], a[0], a[1], a[2], a[3]);
         state[0][i] ^= a[0];
         state[1][i] ^= a[1];
         state[2][i] ^= a[2];
@@ -162,11 +158,11 @@ void AES::SubBytes1(byte state[4][4])
 void AES::ShiftRows(byte state[4][4])
 {
     for(int i = 0; i < 4; i++){
-        word t = Word(state[i][0], state[i][1], state[i][2], state[i][3]);
+        word t = Manager::Word(state[i][0], state[i][1], state[i][2], state[i][3]);
         for(int j = 0; j < i; j++){ // 左移位i次
             RotWord(t);
         }
-        slip(t, state[i][0], state[i][1], state[i][2], state[i][3]);
+        Manager::slip(t, state[i][0], state[i][1], state[i][2], state[i][3]);
     }
 }
 /*
@@ -175,11 +171,11 @@ void AES::ShiftRows(byte state[4][4])
 void AES::ShiftRows1(byte state[4][4])
 {
     for(int i = 0; i < 4; i++){
-        word t = Word(state[i][0], state[i][1], state[i][2], state[i][3]);
+        word t = Manager::Word(state[i][0], state[i][1], state[i][2], state[i][3]);
         for(int j = 0; j < i; j++){ // 右移位i次
             RotWord1(t);
         }
-        slip(t, state[i][0], state[i][1], state[i][2], state[i][3]);
+        Manager::slip(t, state[i][0], state[i][1], state[i][2], state[i][3]);
     }
 }
 /*
@@ -235,153 +231,7 @@ byte AES::mul(byte a, byte b)
     }
     return p;
 }
-/*
- * 读文件内容
- */
-void AES::readFile(QString filepath)
-{
-    QFile file(filepath);
-    file.open(QFile::ReadOnly);
 
-    if(file.isOpen()){
-        qDebug() << "test文件打开成功";
-    }
-
-    QByteArray cont = file.readAll();
-
-    data.clear();
-
-    // 将读取的内容转换成我们这里用的byte类型
-    for(int i = 0; i < cont.size(); i++){
-        data.push_back((byte)cont[i]);
-    }
-
-    qDebug() << "原始数据大小" << data.size();
-
-    // 原始数据的大小
-    int size1 = data.size();
-
-    // 需要填充的个数
-    addSize = 0;
-
-    // 检查data是否符合要求。满足16的倍数
-    if(data.size() % 16 != 0){
-        // 还需要addSize个字节满足要求
-        addSize = 16 - data.size() % 16;
-        // 需要填充addSize个字符, 这里随便填充都可以 我这里填充 'a'
-        for(int i = 0; i < addSize; i++){
-            data.push_back((byte)('a'));
-        }
-    }
-    // 填充的大小
-    size = data.size() - size1;
-
-
-    qDebug() << "加密前的大小" << data.size();
-
-}
-
-
-void AES::saveFile(QString filepath)
-{
-    QString filePath = QFileDialog::getOpenFileName(nullptr, "保存到", ".");
-    // TODO 加密后的数据保存在同一个目录下的文件，同时密钥也要保存在一个文件中
-
-    // TODO 将密钥写入到文件中
-
-
-
-    QFile file(filePath);
-    file.open(QFile::ReadWrite);
-    QDataStream out(&file);
-
-    qDebug() << "加密后的大小" << data1.size();
-
-    int count = 0;
-
-    if(file.isOpen()){
-        qDebug() << "文件打开成功";
-        for(int i = 0; i < data1.size(); i++){
-
-            out << (qint8)data1[i].to_ulong();
-        }
-        file.close();
-        qDebug() << "写文件完毕";
-
-    }
-
-    qDebug() << "写入文件后文件大小" << file.size();
-//    for(int i = 0; i < data1.size(); i++){
-//        cout << data1[i] << endl;
-//    }
-}
-/*
- * 读取加密文件
- */
-void AES::readFile1(QString filepath)
-{
-    QFile file(filepath);
-    file.open(QFile::ReadOnly);
-    if(file.isOpen()){
-        QByteArray cont = file.readAll();
-        data1.clear();
-        for(int i = 0; i < cont.size(); i++){
-            data1.push_back((byte)cont[i]);
-        }
-        file.close();
-    }
-}
-
-void AES::saveFile1()
-{
-
-    cout << "填充的字符个数: " << size << endl;
-
-    // 去掉添加的字符
-    while(size--){
-        data.pop_back();
-    }
-//    cout << "还原后:" << endl;
-//    cout << data.size() << endl;
-//    for(int i = 0; i < data.size(); i++){
-//        cout << data[i] << endl;
-//    }
-
-    QString filePath = QFileDialog::getOpenFileName(nullptr, "保存到", ".");
-    QFile file(filePath);
-    file.open(QFile::ReadWrite);
-    QDataStream out(&file);
-    if(file.isOpen()){
-        qDebug() << "retrun文件打开成功";
-        for(int i = 0; i < data.size(); i++){
-//            cout << (char*)&data[i] << endl;
-//            file.write((char*)&data[i]);
-            out << (qint8)data[i].to_ulong();
-        }
-        qDebug() << "写文件完毕";
-        file.close();
-    }
-//    for(int i = 0; i < data1.size(); i++){
-//        cout << data1[i] << endl;
-//    }
-}
-/*
- * 从160位 选取 128位作为密钥存放在成员变量key中
- */
-void AES::setKey(word res[5])
-{
-    // 这里选前128位作为密钥
-
-    byte a, b, c, d;
-    int p = 0;
-    for(int i = 0; i < 4; i++){ // 4 * 32 = 128
-        slip(res[i], a, b, c, d);
-        key[p++] = a;
-        key[p++] = b;
-        key[p++] = c;
-        key[p++] = d;
-    }
-}
 
 void AES::printState(byte state[4][4])
 {
@@ -392,120 +242,6 @@ void AES::printState(byte state[4][4])
         cout << endl;
     }
 }
-
-/*
- * 所有数据的加密
- */
-void AES::encryption(QString filepath, word p[5])
-{
-    // 1. 设置密码
-    setKey(p);
-    // 2. 读取文件
-    readFile(filepath);
-    // 3. 密钥扩展
-    keyExpansion();
-
-//    cout << "源文件：" << endl;
-
-//    for(int i = 0; i < data.size();i++){
-//        cout << data[i] << endl;
-//    }
-
-    data1.clear();
-
-    // 加密所有的数据
-    for(int i = 0; i < data.size(); i += 16){
-        int p = i;
-        // 每组加密16个
-        byte state[4][4];
-        for(int i = 0; i < 4; i++){
-            for(int j = 0; j < 4; j++){
-                state[i][j] = data[p++];
-            }
-        }
-        // 加密一组
-        Do(state);
-
-        // 保存一组加密后的结果
-        for(int i = 0; i < 4; i++){
-            for(int j = 0; j < 4; j++){
-                data1.push_back(state[i][j]);
-//                cout << state[i][j] << endl;
-            }
-        }
-    }
-    // 保存到文件
-    saveFile(filepath);
-//    cout << "加密后" << endl;
-//    for(int i = 0; i < data1.size(); i++){
-//        cout << data1[i] << endl;
-//    }
-}
-
-void AES::decryption(QString filepath, word p[])
-{
-    // 1. 设置密码
-    setKey(p);
-    // 2. 读取文件, 将加密数据读取到data1中
-    readFile1(filepath);
-    // 3. 密钥扩展
-    keyExpansion();
-    // 4. 分组解密
-
-    qDebug() << "======================";
-
-    data.clear();
-
-    qDebug() << "加密前的大小 " << data1.size();
-
-//    for(int i = 0; i < data1.size(); i++){
-//        cout << data1[i] << endl;
-//    }
-    for(int k = 0; k < data1.size(); k += 16){
-        int t = k;
-        byte state[4][4];
-        for(int i = 0; i < 4; i++){
-            for(int j = 0; j < 4; j++){
-                state[i][j] = data1[t++];
-            }
-        }
-        // 解密一组
-        Do1(state);
-        // 保存一组加密后的结果
-        for(int i = 0; i < 4; i++){
-            for(int j = 0; j < 4; j++){
-                data.push_back(state[i][j]);
-//                cout << state[i][j] << endl;
-            }
-        }
-    }
-    qDebug() << "加密后的大小 " << data.size();
-//    for(int i = 0; i < data.size(); i++){
-//        cout << data[i] << endl;
-//    }
-//    cout << "----------------------------------------" << endl;
-    // 保存到文件
-    qDebug() << "***********************************";
-    saveFile1();
-}
-
-void AES::slip(word t, byte & a, byte & b, byte &c, byte & d)
-{
-    int len = 0;
-    for(int i=0; i < 8; i++){
-        d[i] = t[len++];
-    }
-    for(int i=0; i< 8; i++){
-        c[i] = t[len++];
-    }
-    for(int i=0; i< 8; i++){
-        b[i] = t[len++];
-    }
-    for(int i=0; i< 8; i++){
-        a[i] = t[len++];
-    }
-}
-
 void AES::slip(byte t, bitset<4> &a, bitset<4> &b)
 {
     int p = 0;
@@ -516,25 +252,5 @@ void AES::slip(byte t, bitset<4> &a, bitset<4> &b)
         a[i] = t[p++];
     }
 }
-/*
- * 将四个字节变成一个字
- */
-word AES::Word(byte a, byte b, byte c, byte d)
-{
-    word t;
-    int p = 0;
-    for(int i = 0; i < 8; i++){
-        t[p++] = d[i];
-    }
-    for(int i = 0; i < 8; i++){
-        t[p++] = c[i];
-    }
-    for(int i = 0; i < 8; i++){
-        t[p++] = b[i];
-    }
-    for(int i = 0; i < 8; i++){
-        t[p++] = a[i];
-    }
-    return t;
-}
+
 

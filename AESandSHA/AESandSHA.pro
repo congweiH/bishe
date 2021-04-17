@@ -19,11 +19,15 @@ SOURCES += \
     aes.cpp \
     main.cpp \
     mainwindow.cpp \
+    manager.cpp \
+    mode.cpp \
     sha.cpp
 
 HEADERS += \
     aes.h \
     mainwindow.h \
+    manager.h \
+    mode.h \
     sha.h
 
 FORMS += \

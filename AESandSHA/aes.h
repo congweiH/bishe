@@ -1,26 +1,24 @@
 #ifndef AES_H
 #define AES_H
 
-#include <bitset>
 #include <QFile>
 #include <QByteArray>
 #include <QDebug>
 #include <iostream>
 #include <QVector>
-#include <fstream>
 #include <QIODevice>
 #include <QFileDialog>
 #include <QDataStream>
+#include <QFileInfo>
+#include <QMessageBox>
 
-using namespace std;
+#include "manager.h"
 
 /*
  *  AES-128: 每次处理16个字节，放在4*4的状态矩阵，即每组128bit
  *      10 轮加密，前9次操作一样，最后一次不一样
  *      加密过程设计4种操作： 字节替换、行移位、列混淆、轮密钥加
  */
-typedef bitset<8> byte;  // 字节
-typedef bitset<32> word; // 字
 
 class AES
 {
@@ -40,8 +38,8 @@ public:
     /*
      * 加密一组的过程
      */
-    void Do(byte state[4][4]);
-    void Do1(byte state[4][4]);
+    void block_en(byte state[4][4]);
+    void block_de(byte state[4][4]);
 
     // state 和 w[start, start+4] 异或
     void addRoundKey(byte state[4][4], int start);
@@ -57,41 +55,15 @@ public:
     // 乘法
     byte mul(byte a, byte b);
 
-    // 整个数据的加密过程, 被外界调用
-    void encryption(QString filepath, word p[5]);
-
-    void decryption(QString filepath, word p[5]);
-
 /*
  *  辅助函数
  *
  */
-    void readFile(QString filepath);
-    void saveFile(QString filepath);    // 将加密的结果保存在文件中
-
-    void readFile1(QString filepath);
-    void saveFile1();
-
 
     // 将第一个字分成4个字节
-    void slip(word t, byte & a, byte & b, byte &c, byte & d);
     void slip(byte t, bitset<4> &a, bitset<4> &b);
-    word Word(byte a, byte b, byte c,byte d);
 
-    // 密钥
-    byte key[16];
-    void setKey(word res[5]);
     word w[44];  //密钥扩展后的
-
-    // 存放原始数据
-    QVector<byte> data;
-    int size;
-    // 填充的字符个数
-    int addSize;
-
-    // 存放加密后的数据
-    QVector<byte> data1;
-
 
     void printState(byte state[4][4]);
 

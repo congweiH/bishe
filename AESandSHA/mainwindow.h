@@ -8,8 +8,12 @@
 #include <QDebug>
 #include <QFile>
 #include <QByteArray>
+#include <QFileInfo>
+#include <QDataStream>
+#include <QTextStream>
 #include "aes.h"
 #include "sha.h"
+#include "mode.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -25,7 +29,18 @@ public:
 
     SHA sha;
 
-    AES aes;
+    Mode mode;
+
+    QString passwd;
+
+    // 检查口令是否合法
+    bool checkPasswd();
+
+    void setPasswd();
+
+    void getMode();
+    // 加密解密之前的工作
+    void init();
 
 private slots:
     void on_pB_selectfile_clicked();
@@ -33,6 +48,15 @@ private slots:
     void on_pB_encryption_clicked();
 
     void on_pB_decryption_clicked();
+
+    void on_lineEdit_filepath_editingFinished();
+
+
+    void on_cB_usepasswdfile_stateChanged(int state);
+
+    void on_pB_passwdfile_clicked();
+
+    void on_pB_savepasswd_clicked();
 
 private:
     Ui::MainWindow *ui;

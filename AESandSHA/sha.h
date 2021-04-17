@@ -3,16 +3,13 @@
 
 #include <QString>
 #include <QDebug>
-#include <bitset>
 #include <iostream>
-#include <bits/stdc++.h>
 #include <QVector>
-#pragma once
+#include <iostream>
+#include <iomanip>
 using namespace std;
 
-typedef bitset<8> byte; // 字节
-typedef bitset<32> word;  // 字
-
+#include "manager.h"
 
 /*
  * SHA-1原理讲解：https://www.cnblogs.com/sky-heaven/p/10138539.html
@@ -72,12 +69,7 @@ public:
     word add(word a, word b);// 模2^32加函数
     void Do(word H[5]); // 4 轮计算
 
-    void slip(word t, byte &a,byte &b,byte &c,byte &d);  // 将第一字分成4个字节
     void slip(bitset<64> t, byte res[8]);   // 将64位分成8个字节
-    word Word(byte a,byte b, byte c,byte d); // 将4个字节拼成一个字
-
-
-
 
 
     // 存放扩充后的数据
