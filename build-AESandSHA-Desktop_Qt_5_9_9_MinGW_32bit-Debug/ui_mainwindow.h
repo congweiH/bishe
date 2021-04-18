@@ -85,7 +85,7 @@ public:
         textEdit_passwd->setGeometry(QRect(30, 60, 631, 131));
         groupBox_3 = new QGroupBox(centralwidget);
         groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
-        groupBox_3->setGeometry(QRect(700, 130, 161, 231));
+        groupBox_3->setGeometry(QRect(700, 120, 161, 241));
         cB_mode = new QComboBox(groupBox_3);
         cB_mode->setObjectName(QStringLiteral("cB_mode"));
         cB_mode->setGeometry(QRect(30, 110, 91, 31));

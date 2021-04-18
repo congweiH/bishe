@@ -74,6 +74,11 @@ void Manager::readDataFromCipherFile()
 
 void Manager::saveDataToPlainFile()
 {
+    // 去掉添加的字符
+    for(int i = 0; i < Manager::addSize; i++){
+       Manager::data.pop_back();
+    }
+
     QFileInfo fileInfo = QFileInfo(filepath);
     // 文件名字
     QString file_name = fileInfo.fileName();

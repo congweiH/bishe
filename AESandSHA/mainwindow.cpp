@@ -111,6 +111,8 @@ void MainWindow::on_pB_encryption_clicked()
 
     // 设置模式
     Manager::mode = ui->cB_mode->currentIndex();
+
+
     // 从文件中读取数据到data中
     Manager::readDataFromPlainFile();
 

@@ -44,6 +44,7 @@ public:
     // CTR
     void CTR_en();
     void CTR_de();
+    void plusOne(byte IV[16]);
 
 };
 
