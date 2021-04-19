@@ -1,0 +1,16 @@
+INPUT(
+./release\aes.o
+./release\cryption.o
+./release\dethread.o
+./release\enthread.o
+./release\main.o
+./release\mainwindow.o
+./release\manager.o
+./release\mode.o
+./release\sha.o
+./release\moc_cryption.o
+./release\moc_dethread.o
+./release\moc_enthread.o
+./release\moc_mainwindow.o
+./release\moc_mode.o
+);

@@ -69,8 +69,6 @@ public:
     word add(word a, word b);// 模2^32加函数
     void Do(word H[5]); // 4 轮计算
 
-    void slip(bitset<64> t, byte res[8]);   // 将64位分成8个字节
-
 
     // 存放扩充后的数据
     QVector<byte> p;

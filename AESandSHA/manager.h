@@ -11,8 +11,8 @@
 #include <QDataStream>
 using namespace std;
 
-typedef bitset<8> byte;
-typedef bitset<32> word;
+typedef uint8_t byte;
+typedef uint32_t word;
 
 
 class Manager
@@ -20,14 +20,13 @@ class Manager
 public:
     Manager();
 
-    static void readDataFromPlainFile();
-    static void readDataFromCipherFile();
-
-    static void saveDataToPlainFile();
-    static void saveDataToCipherFile();
 
     // 设置密钥
     static void setKey(word res[5]);
+
+    static void slip(uint64_t t, byte res[8]);
+
+    static void slip(byte t, int &high, int &low);
 
     // 将一个字分成4个字节
     static void slip(word t, byte & a, byte & b, byte &c, byte & d);
@@ -42,13 +41,18 @@ public:
     static QString addSuffix;
 
     // 数据
-    static QVector<byte> data;
+    static byte* data;
+    static int dataSize;
+
     // 填充的大小
     static int addSize;
     // 填充的字符
     static char addChar;
     // 使用何种模式
     static int mode;
+    // 一次从文件中读入或写入多少个字节
+    static int readBytes;
+
 };
 
 #endif // MANAGER_H

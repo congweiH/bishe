@@ -4,6 +4,7 @@
 
 #include "manager.h"
 #include "aes.h"
+#include <time.h>
 /*
  * 加密五种模式
  *
@@ -13,16 +14,15 @@
  *  3 OFB
  *  4 CTR
  */
-class Mode
+class Mode : public QObject
 {
+
+    Q_OBJECT
+
 public:
-    Mode();
+    explicit Mode(QObject *parent = nullptr);
 
     AES aes;
-
-    // 加密和解密
-    void encryption();
-    void decryption();
 
     // ECB模式 加密
     void ECB_en();
@@ -45,6 +45,8 @@ public:
     void CTR_en();
     void CTR_de();
     void plusOne(byte IV[16]);
+
+
 
 };
 

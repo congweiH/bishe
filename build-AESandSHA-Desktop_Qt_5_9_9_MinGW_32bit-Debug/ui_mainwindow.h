@@ -20,6 +20,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QProgressBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTextEdit>
@@ -43,6 +44,8 @@ public:
     QTextEdit *textEdit_passwd;
     QGroupBox *groupBox_3;
     QComboBox *cB_mode;
+    QProgressBar *progressBar;
+    QPushButton *pB_cancle;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -55,10 +58,10 @@ public:
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         pB_encryption = new QPushButton(centralwidget);
         pB_encryption->setObjectName(QStringLiteral("pB_encryption"));
-        pB_encryption->setGeometry(QRect(180, 400, 141, 41));
+        pB_encryption->setGeometry(QRect(180, 370, 141, 41));
         pB_decryption = new QPushButton(centralwidget);
         pB_decryption->setObjectName(QStringLiteral("pB_decryption"));
-        pB_decryption->setGeometry(QRect(510, 400, 161, 41));
+        pB_decryption->setGeometry(QRect(510, 370, 161, 41));
         groupBox = new QGroupBox(centralwidget);
         groupBox->setObjectName(QStringLiteral("groupBox"));
         groupBox->setGeometry(QRect(20, 30, 841, 81));
@@ -89,6 +92,13 @@ public:
         cB_mode = new QComboBox(groupBox_3);
         cB_mode->setObjectName(QStringLiteral("cB_mode"));
         cB_mode->setGeometry(QRect(30, 110, 91, 31));
+        progressBar = new QProgressBar(centralwidget);
+        progressBar->setObjectName(QStringLiteral("progressBar"));
+        progressBar->setGeometry(QRect(20, 430, 661, 21));
+        progressBar->setValue(24);
+        pB_cancle = new QPushButton(centralwidget);
+        pB_cancle->setObjectName(QStringLiteral("pB_cancle"));
+        pB_cancle->setGeometry(QRect(710, 420, 121, 31));
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QStringLiteral("menubar"));
@@ -123,6 +133,7 @@ public:
          << QApplication::translate("MainWindow", "OFB", Q_NULLPTR)
          << QApplication::translate("MainWindow", "CTR", Q_NULLPTR)
         );
+        pB_cancle->setText(QApplication::translate("MainWindow", "\345\217\226\346\266\210", Q_NULLPTR));
     } // retranslateUi
 
 };

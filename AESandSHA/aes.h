@@ -38,20 +38,20 @@ public:
     /*
      * 加密一组的过程
      */
-    void block_en(byte state[4][4]);
-    void block_de(byte state[4][4]);
+    void block_en(byte *state);
+    void block_de(byte *state);
 
     // state 和 w[start, start+4] 异或
-    void addRoundKey(byte state[4][4], int start);
+    void addRoundKey(byte *state, int start);
     // 字节替换
-    void SubBytes(byte state[4][4]);
-    void SubBytes1(byte state[4][4]);
+    void SubBytes(byte *state);
+    void SubBytes1(byte *state);
     // 行移位
-    void ShiftRows(byte state[4][4]);
-    void ShiftRows1(byte state[4][4]);
+    void ShiftRows(byte *state);
+    void ShiftRows1(byte *state);
     // 列混淆
-    void MixColumns(byte state[4][4]);
-    void MixColumns1(byte state[4][4]);
+    void MixColumns(byte *state);
+    void MixColumns1(byte *state);
     // 乘法
     byte mul(byte a, byte b);
 
@@ -60,12 +60,8 @@ public:
  *
  */
 
-    // 将第一个字分成4个字节
-    void slip(byte t, bitset<4> &a, bitset<4> &b);
-
     word w[44];  //密钥扩展后的
 
-    void printState(byte state[4][4]);
 
     // 密钥扩展中的轮常量
     word Rcon[10] = {0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000,

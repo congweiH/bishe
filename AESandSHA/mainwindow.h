@@ -11,9 +11,12 @@
 #include <QFileInfo>
 #include <QDataStream>
 #include <QTextStream>
+#include <QProgressBar>
 #include "aes.h"
 #include "sha.h"
 #include "mode.h"
+#include "enthread.h"
+#include "dethread.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -29,7 +32,8 @@ public:
 
     SHA sha;
 
-    Mode mode;
+    EnThread *enThread;
+    DeThread *deThread;
 
     QString passwd;
 
@@ -42,6 +46,7 @@ public:
     // 加密解密之前的工作
     void init();
 
+    void valueChanged(double value);
 private slots:
     void on_pB_selectfile_clicked();
 
@@ -57,6 +62,8 @@ private slots:
     void on_pB_passwdfile_clicked();
 
     void on_pB_savepasswd_clicked();
+
+    void on_pB_cancle_clicked();
 
 private:
     Ui::MainWindow *ui;

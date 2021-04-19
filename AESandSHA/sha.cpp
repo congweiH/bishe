@@ -26,11 +26,11 @@ void SHA::sha1(QString passwd, word res[])
     }
 
     cout << "sha-1 result:" << endl;
-    cout<<setw(8)<< setfill('0')<<hex<<H[0].to_ulong();
-    cout<<setw(8)<< setfill('0')<<hex<<H[1].to_ulong();
-    cout<<setw(8)<< setfill('0')<<hex<<H[2].to_ulong();
-    cout<<setw(8)<< setfill('0')<<hex<<H[3].to_ulong();
-    cout<<setw(8)<< setfill('0')<<hex<<H[4].to_ulong()<<endl<<endl;
+    cout<<setw(8)<< setfill('0')<<hex<<H[0];
+    cout<<setw(8)<< setfill('0')<<hex<<H[1];
+    cout<<setw(8)<< setfill('0')<<hex<<H[2];
+    cout<<setw(8)<< setfill('0')<<hex<<H[3];
+    cout<<setw(8)<< setfill('0')<<hex<<H[4]<<endl<<endl;
 }
 /*
  * 信息扩展: 变成512位. 这里passwd口令不超过55个字符【后面改进】
@@ -53,11 +53,13 @@ void SHA::extend(QString passwd)
     }
 
     // 填充长度，占64位, 8个字节
-    bitset<64> t = len * 8;
+    uint64_t t = len * 8;
     // 将64位分成8个字节
     byte res[8];
-    slip(t, res);
-    for(int i = 0; i < 8;i++){
+
+    Manager::slip(t, res);
+
+    for(int i = 7; i >=0 ;i--){
         p.push_back(res[i]);
     }
 
@@ -115,17 +117,7 @@ void SHA::createW(int start)
  */
 word SHA::add(word a, word b)
 {
-    word c;
-    int d = 0; // 进位
-    for(int i = 0; i < 32; i++){
-        c[i] = (a[i] + b[i] + d) % 2;
-        if(a[i] + b[i] + d >= 2){
-            d = 1;
-        }else if(a[i] + b[i] + d < 2){
-            d = 0;
-        }
-    }
-    return c;
+    return a + b;
 }
 /*
  * SHA-1有4轮计算，每一轮包括20个步骤，一共80步
@@ -151,16 +143,7 @@ void SHA::Do(word H[5])
     H[2] = add(H[2], C);
     H[3] = add(H[3], D);
     H[4] = add(H[4], E);
-
 }
 
-void SHA::slip(bitset<64> t, byte res[8])
-{
-    int p = 0;
-    for(int i = 7; i >= 0; i--){
-        for(int j = 0; j < 8; j++){
-            res[i][j] = t[p++];
-        }
-    }
-}
+
 

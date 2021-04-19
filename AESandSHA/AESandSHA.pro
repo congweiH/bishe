@@ -17,6 +17,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     aes.cpp \
+    cryption.cpp \
+    dethread.cpp \
+    enthread.cpp \
     main.cpp \
     mainwindow.cpp \
     manager.cpp \
@@ -25,6 +28,9 @@ SOURCES += \
 
 HEADERS += \
     aes.h \
+    cryption.h \
+    dethread.h \
+    enthread.h \
     mainwindow.h \
     manager.h \
     mode.h \

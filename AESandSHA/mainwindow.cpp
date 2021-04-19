@@ -12,6 +12,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->pB_encryption->setDisabled(true);
     // 选择密钥文件初始化disabled
     ui->pB_passwdfile->setDisabled(true);
+
+    valueChanged(0);
+    // 线程
+    enThread = new EnThread(this);
+    deThread = new DeThread(this);
+    connect(&enThread->cryption, &Cryption::changeValue, this, &MainWindow::valueChanged);
+    connect(&deThread->cryption, &Cryption::changeValue, this, &MainWindow::valueChanged);
 }
 
 MainWindow::~MainWindow()
@@ -67,7 +74,7 @@ void MainWindow::getMode()
     file.open(QFile::ReadOnly);
     if(file.isOpen()){
         QByteArray cont = file.readLine();
-        Manager::mode = ((byte)cont[16]).to_ulong();
+        Manager::mode = ((byte)cont[16]);
         file.close();
     }else{
         qDebug() << Manager::filepath << "打开失败";
@@ -107,23 +114,24 @@ void MainWindow::on_pB_encryption_clicked()
         QMessageBox::warning(this, "错误", "密码错误");
         return;
     }
-
-
     // 设置模式
     Manager::mode = ui->cB_mode->currentIndex();
-
-
-    // 从文件中读取数据到data中
-    Manager::readDataFromPlainFile();
 
     ui->statusbar->showMessage("加密中...");
 
     // 加密
-    mode.encryption();
+    //mode.encryption();
+    valueChanged(1);
+    enThread->start();
+    connect(enThread, &EnThread::isDone, this, [=](){
+        ui->progressBar->setValue(100);
 
-    Manager::saveDataToCipherFile();
-    // 提示加密完成
-    ui->statusbar->showMessage("加密完成!");
+        // 提示加密完成
+        ui->statusbar->showMessage("加密完成!");
+
+        enThread->quit();
+
+    });
 }
 /*
  * 解密
@@ -141,17 +149,24 @@ void MainWindow::on_pB_decryption_clicked()
 
     ui->cB_mode->setCurrentIndex(Manager::mode);
 
-    // 从密文文件中读入数据
-    Manager::readDataFromCipherFile();
-
     ui->statusbar->showMessage("解密中...");
-
     // 解密
-    mode.decryption();
+    //mode.decryption();
+    valueChanged(1);
+    deThread->start();
+    connect(deThread, &DeThread::isDone, this, [=](){
 
-    Manager::saveDataToPlainFile();
-    // 提示解密完成
-    ui->statusbar->showMessage("解密完成!");
+
+        ui->progressBar->setValue(100);
+
+        // 提示解密完成
+        ui->statusbar->showMessage("解密完成!");
+
+        deThread->quit();
+    });
+
+
+
 }
 
 void MainWindow::on_lineEdit_filepath_editingFinished()
@@ -221,3 +236,24 @@ void MainWindow::on_pB_savepasswd_clicked()
     }
 }
 
+
+void MainWindow::valueChanged(double value)
+{
+    ui->progressBar->setValue(value);
+}
+
+void MainWindow::on_pB_cancle_clicked()
+{
+    if(enThread->isRunning()){
+        qDebug() << "en";
+        enThread->terminate();
+        enThread->wait();
+    }
+    if(deThread->isRunning()){
+        qDebug() << "de";
+        deThread->terminate();
+        deThread->wait();
+    }
+    valueChanged(0);
+    ui->statusbar->showMessage("取消成功!");
+}
