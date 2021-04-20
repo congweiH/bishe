@@ -26,7 +26,6 @@ public:
 
     static void slip(uint64_t t, byte res[8]);
 
-    static void slip(byte t, int &high, int &low);
 
     // 将一个字分成4个字节
     static void slip(word t, byte & a, byte & b, byte &c, byte & d);

@@ -3,6 +3,7 @@
 Cryption::Cryption(QObject *parent) : QObject(parent)
 {
 
+
 }
 
 void Cryption::encryption()
@@ -42,23 +43,22 @@ void Cryption::encryption()
     out << (qint8)Manager::addSize;
     qDebug() << "写填充长度" << Manager::addSize;
 
-
+    // 记得要释放
     Manager::data = new byte[Manager::readBytes];
+
+    // 文件大小
+    long long filesize = readfile.size();
 
     long long sum = 0;
 
     // 一次读入文件的一部分进行加密
     while((Manager::dataSize=readfile.read((char *)Manager::data, Manager::readBytes))!=0){
-
+        // 如果是最后一组，需要填充字符
         if(Manager::dataSize < Manager::readBytes){
             for(int i = 0; i < Manager::addSize; i++){
                 Manager::data[Manager::dataSize++] = Manager::addChar;
             }
         }
-
-        sum += Manager::dataSize;
-
-        //value = 1.0  * sum / readfile.size();
 
         switch (Manager::mode) {
         case 0:
@@ -77,17 +77,17 @@ void Cryption::encryption()
             mode.CTR_en();
             break;
         }
-//        int af = clock();
-        emit changeValue(100.0 * sum / readfile.size());
-//        int ab = clock();
-
-//        qDebug() << "一次发送信号的时间" << ab - af;
+        // 更新进度条
+        sum += Manager::dataSize;
+        emit changeValue(100.0 * sum / filesize);
 
         // 写入文件
         for(int i = 0; i < Manager::dataSize; i++){
             out << (qint8)Manager::data[i];
         }
     }
+    // new 的数组要释放
+    delete[] Manager::data;
     readfile.close();
     savefile.close();
 
@@ -96,7 +96,7 @@ void Cryption::encryption()
 void Cryption::decryption()
 {
 
-    qDebug() << Manager::mode;
+    qDebug() << "mode" << Manager::mode;
 
     QFile readfile(Manager::filepath);
     readfile.open(QFile::ReadOnly);
@@ -107,6 +107,7 @@ void Cryption::decryption()
         readfile.read(sizebuffer, 1);
         Manager::addSize = ((byte)sizebuffer[0]);
     }
+    delete []sizebuffer;
 
     QFileInfo fileInfo = QFileInfo(Manager::filepath);
     // 文件名字
@@ -134,13 +135,12 @@ void Cryption::decryption()
 
     Manager::data = new byte[Manager::readBytes];
 
+    // 文件大小
+    long long filesize = readfile.size();
+
     int sum = 0;
 
     while((Manager::dataSize=readfile.read((char*)Manager::data, Manager::readBytes))!=0){
-
-
-        // 更新进度条
-        sum += Manager::dataSize;
 
         switch (Manager::mode) {
         case 0:
@@ -160,16 +160,15 @@ void Cryption::decryption()
             break;
         }
 
-        emit changeValue(100.0 * sum / readfile.size());
-
+        // 更新进度条
+        sum += Manager::dataSize;
+        emit changeValue(100.0 * sum / filesize);
 
         times --;
         if(times==0){
             // 去掉后面添加的字符
             qDebug() << "addSize" << Manager::addSize;
-            while(Manager::addSize--){
-                Manager::dataSize--;
-            }
+            Manager::dataSize -= Manager::addSize;
         }
 
         for(int i = 0; i < Manager::dataSize; i++){
@@ -177,6 +176,7 @@ void Cryption::decryption()
         }
 
     }
+    delete[] Manager::data;
     readfile.close();
     savefile.close();
 }

@@ -13,7 +13,7 @@ int Manager::addSize = 0;
 char Manager::addChar = 'a';
 int Manager::mode = -1;
 QString Manager::addSuffix = "_en";
-int Manager::readBytes = 1024;  // 一次读入1024B，也就是1M
+int Manager::readBytes = 1024*10;  // 一次读入1024B，也就是1M
 
 /*
  * 从160位 选取 128位作为密钥存放在成员变量key中
@@ -39,11 +39,6 @@ void Manager::slip(uint64_t t, byte res[8])
     }
 }
 
-void Manager::slip(byte t, int &high, int &low)
-{
-    high = (t >> 4) & 0x0f;
-    low = t & 0x0f;
-}
 void Manager::slip(word t, byte & a, byte & b, byte &c, byte & d)
 {
     a = (byte)((t >> 24) & 0xff);
@@ -63,6 +58,3 @@ word Manager::Word(byte a, byte b, byte c, byte d)
     return ta | tb | tc | td;
 
 }
-
-
-

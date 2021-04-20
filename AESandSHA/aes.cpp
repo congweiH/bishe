@@ -17,7 +17,7 @@ void AES::keyExpansion()
     for(int i = 4; i < 44; i++){
         word temp = w[i-1];
         if(i % 4 == 0){
-            temp = SubWord(RotWord(temp)) ^ Rcon[i/4];
+            temp = SubWord(RotWord(temp, 1)) ^ Rcon[i/4];
         }
         w[i] = w[i-4] ^ temp;
     }
@@ -38,36 +38,34 @@ word AES::SubWord(word t)
 }
 byte AES::SubByte(byte t)
 {
-    int high, low;
-    // 将第一个字节分成两部分
-    Manager::slip(t, high, low);
+    int high = t >> 4;
+    int low = t & 0x0f;
     // 高四位作为行值，低四位作为列值
     return SBox[high][low];
 }
 
 byte AES::SubByte1(byte t)
 {
-    int high, low;
-    // 将第一个字节分成两部分
-    Manager::slip(t, high, low);
+    int high = t >> 4;
+    int low = t & 0x0f;
     // 高四位作为行值，低四位作为列值
     return SBoxInv[high][low];
 }
 /*
  * 左循环一个字节[t0, t1, t2, t3] -> [t1, t2, t3 ,t0]
  */
-word AES::RotWord(word t)
+word AES::RotWord(word t, int n)
 {
-    byte a[4];
-    Manager::slip(t, a[0], a[1], a[2], a[3]);
-    return Manager::Word(a[1], a[2], a[3], a[0]);
+    word high = t << (n*8);
+    word low = t >> (32-n*8);
+    return high | low;
 }
-
-word AES::RotWord1(word t)
+// 右循环一个字节[t0, t1, t2, t3] -> [t3, t0, t1 ,t2]
+word AES::RotWord1(word t, int n)
 {
-    byte a[4];
-    Manager::slip(t, a[0], a[1], a[2], a[3]);
-    return Manager::Word(a[3], a[0], a[1], a[2]);
+    word high = t << (32-n*8);
+    word low = t >> (n*8);
+    return high | low;
 }
 /*
  * 加密一组的过程
@@ -158,9 +156,9 @@ void AES::ShiftRows(byte *state)
 {
     for(int i = 0; i < 4; i++){
         word t = Manager::Word(state[4*i+0], state[4*i+1], state[4*i+2], state[4*i+3]);
-        for(int j = 0; j < i; j++){ // 左移位i次
-            RotWord(t);
-        }
+
+        RotWord(t, i);
+
         Manager::slip(t, state[4*i+0], state[4*i+1], state[4*i+2], state[4*i+3]);
     }
 }
@@ -171,9 +169,9 @@ void AES::ShiftRows1(byte *state)
 {
     for(int i = 0; i < 4; i++){
         word t = Manager::Word(state[4*i+0], state[4*i+1], state[4*i+2], state[4*i+3]);
-        for(int j = 0; j < i; j++){ // 右移位i次
-            RotWord1(t);
-        }
+
+        RotWord1(t, i);
+
         Manager::slip(t, state[4*i+0], state[4*i+1], state[4*i+2], state[4*i+3]);
     }
 }
@@ -210,20 +208,89 @@ void AES::MixColumns1(byte *state)
     }
 }
 // TODO GF(2^8)上的乘法 (难点)
-byte AES::mul(byte a, byte b)
-{
-    byte p = 0, h;
+//byte AES::mul(byte a, byte b)
+//{
+//    byte p = 0, h;
 
-    for(int i = 0;i < 8; i++){
-        if((b & byte(1)) != 0){
-            p ^= a;
-        }
-        h = (byte) (a & byte(0x80));
-        a <<= 1;
-        if (h != 0) {
-            a ^= 0x1b; /* x^8 + x^4 + x^3 + x + 1 */
-        }
-        b >>= 1;
+//    for(int i = 0; i < 8; i++){
+//        if((b & byte(1)) != 0){
+//            p ^= a;
+//        }
+//        h = (byte) (a & byte(0x80));
+//        a <<= 1;
+//        if (h != 0) {
+//            a ^= 0x1b; /* x^8 + x^4 + x^3 + x + 1 */
+//        }
+//        b >>= 1;
+//    }
+//    return p;
+//}
+byte AES::GFMul2(byte s) {
+    byte result = s << 1;
+    byte a7 = result & 0x0100;
+
+    if(a7 != 0) {
+        result = result & 0x00ff;
+        result = result ^ 0x1b;
     }
-    return p;
+
+    return result;
 }
+
+byte AES::GFMul3(byte s) {
+    return GFMul2(s) ^ s;
+}
+
+byte AES::GFMul4(byte s) {
+    return GFMul2(GFMul2(s));
+}
+
+byte AES::GFMul8(byte s) {
+    return GFMul2(GFMul4(s));
+}
+
+byte AES::GFMul9(byte s) {
+    return GFMul8(s) ^ s;
+}
+
+ byte AES::GFMul11(byte s) {
+    return GFMul9(s) ^ GFMul2(s);
+}
+
+byte AES::GFMul12(byte s) {
+    return GFMul8(s) ^ GFMul4(s);
+}
+
+byte AES::GFMul13(byte s) {
+    return GFMul12(s) ^ s;
+}
+
+byte AES::GFMul14(byte s) {
+    return GFMul12(s) ^ GFMul2(s);
+}
+
+/**
+ * GF上的二元运算
+ */
+byte AES::mul(byte n, byte s) {
+    byte result;
+
+    if(n == 1)
+        result = s;
+    else if(n == 2)
+        result = GFMul2(s);
+    else if(n == 3)
+        result = GFMul3(s);
+    else if(n == 0x9)
+        result = GFMul9(s);
+    else if(n == 0xb)//11
+        result = GFMul11(s);
+    else if(n == 0xd)//13
+        result = GFMul13(s);
+    else if(n == 0xe)//14
+        result = GFMul14(s);
+
+    return result;
+}
+
+

@@ -62,8 +62,8 @@ void SHA::extend(QString passwd)
     for(int i = 7; i >=0 ;i--){
         p.push_back(res[i]);
     }
-
 }
+// 循环左移n位
 word SHA::S(word x, int n)
 {
     word temp1 = x << n;
@@ -144,6 +144,3 @@ void SHA::Do(word H[5])
     H[3] = add(H[3], D);
     H[4] = add(H[4], E);
 }
-
-
-

@@ -19,10 +19,15 @@ MainWindow::MainWindow(QWidget *parent)
     deThread = new DeThread(this);
     connect(&enThread->cryption, &Cryption::changeValue, this, &MainWindow::valueChanged);
     connect(&deThread->cryption, &Cryption::changeValue, this, &MainWindow::valueChanged);
+
 }
 
 MainWindow::~MainWindow()
 {
+    qDebug() << "析构函数执行";
+    delete Manager::data;
+    delete enThread;
+    delete deThread;
     delete ui;
 }
 
@@ -84,6 +89,7 @@ void MainWindow::getMode()
 
 void MainWindow::init()
 {
+
     setPasswd();
 
     word res[5];
@@ -120,8 +126,6 @@ void MainWindow::on_pB_encryption_clicked()
     ui->statusbar->showMessage("加密中...");
 
     // 加密
-    //mode.encryption();
-    valueChanged(1);
     enThread->start();
     connect(enThread, &EnThread::isDone, this, [=](){
         ui->progressBar->setValue(100);
@@ -151,8 +155,6 @@ void MainWindow::on_pB_decryption_clicked()
 
     ui->statusbar->showMessage("解密中...");
     // 解密
-    //mode.decryption();
-    valueChanged(1);
     deThread->start();
     connect(deThread, &DeThread::isDone, this, [=](){
 
@@ -164,8 +166,6 @@ void MainWindow::on_pB_decryption_clicked()
 
         deThread->quit();
     });
-
-
 
 }
 
@@ -255,5 +255,27 @@ void MainWindow::on_pB_cancle_clicked()
         deThread->wait();
     }
     valueChanged(0);
+    delete[] Manager::data;
     ui->statusbar->showMessage("取消成功!");
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    qDebug() << "关闭事件触发";
+    if(enThread->isRunning()){
+        qDebug() << "en";
+        enThread->terminate();
+        enThread->wait();
+    }
+    if(deThread->isRunning()){
+        qDebug() << "de";
+        deThread->terminate();
+        deThread->wait();
+    }
+    delete enThread;
+    delete deThread;
+    valueChanged(0);
+    delete[] Manager::data;
+    // 告诉程序这是正常退出
+    exit(0);
 }

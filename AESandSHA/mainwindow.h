@@ -12,6 +12,7 @@
 #include <QDataStream>
 #include <QTextStream>
 #include <QProgressBar>
+#include <QCloseEvent>
 #include "aes.h"
 #include "sha.h"
 #include "mode.h"
@@ -65,6 +66,8 @@ private slots:
 
     void on_pB_cancle_clicked();
 
+protected:
+     void closeEvent(QCloseEvent *event);
 private:
     Ui::MainWindow *ui;
 };
