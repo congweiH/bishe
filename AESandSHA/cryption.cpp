@@ -24,9 +24,9 @@ void Cryption::encryption()
     QString file_suffix = fileInfo.suffix();
     // 绝对路劲
     QString file_path = fileInfo.absolutePath();
-    QString savePath = file_path + "/" + base_name + "." + file_suffix + Manager::addSuffix;
+    Manager::savepath = file_path + "/" + base_name + "." + file_suffix + Manager::addSuffix;
 
-    QFile savefile(savePath);
+    QFile savefile(Manager::savepath);
     savefile.open(QFile::WriteOnly);
     QDataStream out(&savefile);
     // 写密码, 占16个字节
@@ -119,8 +119,8 @@ void Cryption::decryption()
     // 绝对路劲
     QString file_path = fileInfo.absolutePath();
 
-    QString savePath = file_path + "/" + base_name + "." + file_suffix.remove(Manager::addSuffix);
-    QFile savefile(savePath);
+    Manager::savepath = file_path + "/" + base_name + "." + file_suffix.remove(Manager::addSuffix);
+    QFile savefile(Manager::savepath);
     savefile.open(QFile::ReadWrite);
     QDataStream out(&savefile);
 

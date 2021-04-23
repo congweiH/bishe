@@ -8,6 +8,7 @@ INPUT(
 ./release\manager.o
 ./release\mode.o
 ./release\sha.o
+./release\qrc_res.o
 ./release\moc_cryption.o
 ./release\moc_dethread.o
 ./release\moc_enthread.o

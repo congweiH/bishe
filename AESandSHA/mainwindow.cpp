@@ -6,12 +6,18 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    // 添加图标
+    setWindowIcon(QIcon(":/Encryption.ico"));
+
 
     // 程序已启动，加密和解密按钮都不能按，因为这个时候没有选择文件和口令
     ui->pB_decryption->setDisabled(true);
     ui->pB_encryption->setDisabled(true);
     // 选择密钥文件初始化disabled
     ui->pB_passwdfile->setDisabled(true);
+
+    // 取消按钮不能按
+    ui->pB_cancle->setDisabled(true);
 
     valueChanged(0);
     // 线程
@@ -127,11 +133,18 @@ void MainWindow::on_pB_encryption_clicked()
 
     // 加密
     enThread->start();
+
+    // 线程启动，取消按钮可以按
+    ui->pB_cancle->setDisabled(false);
+
     connect(enThread, &EnThread::isDone, this, [=](){
         ui->progressBar->setValue(100);
 
         // 提示加密完成
         ui->statusbar->showMessage("加密完成!");
+
+        // 加密完成取消按钮不能按
+        ui->pB_cancle->setDisabled(true);
 
         enThread->quit();
 
@@ -156,6 +169,10 @@ void MainWindow::on_pB_decryption_clicked()
     ui->statusbar->showMessage("解密中...");
     // 解密
     deThread->start();
+
+    // 线程启动，取消按钮可以按
+    ui->pB_cancle->setDisabled(false);
+
     connect(deThread, &DeThread::isDone, this, [=](){
 
 
@@ -163,6 +180,9 @@ void MainWindow::on_pB_decryption_clicked()
 
         // 提示解密完成
         ui->statusbar->showMessage("解密完成!");
+
+        // 完成取消按钮不能按
+        ui->pB_cancle->setDisabled(true);
 
         deThread->quit();
     });
@@ -257,6 +277,8 @@ void MainWindow::on_pB_cancle_clicked()
     valueChanged(0);
     delete[] Manager::data;
     ui->statusbar->showMessage("取消成功!");
+
+    ui->pB_cancle->setDisabled(true);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

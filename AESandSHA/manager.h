@@ -36,6 +36,8 @@ public:
 
     // 加密或解密的文件路径
     static QString filepath;
+    // 保存路径
+    static QString savepath;
     // 加密文件后缀添加的字符串
     static QString addSuffix;
 

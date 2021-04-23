@@ -14,6 +14,8 @@
 
 #include "manager.h"
 
+#define mul(a,b) gmult[256*a + b]
+
 /*
  *  AES-128: 每次处理16个字节，放在4*4的状态矩阵，即每组128bit
  *      10 轮加密，前9次操作一样，最后一次不一样
@@ -53,10 +55,7 @@ public:
     void MixColumns(byte *state);
     void MixColumns1(byte *state);
     // 乘法
-    byte mul1(byte a, byte b);
-
-    byte mul(byte n, byte s);
-
+//    byte mul(byte a, byte b);
 
     byte GFMul14(byte s);
 
@@ -68,6 +67,10 @@ public:
     byte GFMul4(byte s);
     byte GFMul3(byte s);
     byte GFMul2(byte s);
+
+    void mult(uint8_t *a, uint8_t *b, uint8_t *d);
+    void mix_columns(uint8_t *state);
+    void inv_mix_columns(uint8_t *state);
 /*
  *  辅助函数
  *

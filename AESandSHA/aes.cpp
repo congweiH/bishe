@@ -83,6 +83,7 @@ void AES::block_en(byte state[16])
         ShiftRows(state);
         // 3. 列混淆
         MixColumns(state);
+//        mix_columns(state);
         // 4. 轮密钥加
         addRoundKey(state, i);
     }
@@ -108,6 +109,7 @@ void AES::block_de(byte *state)
         addRoundKey(state, i);
         // inv mix colums
         MixColumns1(state);
+//        inv_mix_columns(state);
     }
     // 第10次
     ShiftRows1(state);
@@ -119,13 +121,17 @@ void AES::block_de(byte *state)
  */
 void AES::addRoundKey(byte *state, int start)
 {
-    byte a[4];
+//    byte a[4];
     // 一共4列
     for(int j = 0; j < 4; j++){
-        // state第i列与 w 第i个字异或
-        Manager::slip(w[start+j], a[0], a[1], a[2], a[3]);
+        // state第j列与 w 第j个字异或
+        //Manager::slip(w[start+j], a[0], a[1], a[2], a[3]);
+//        a[0] = (byte)((w[start+j] >> 24) & 0xff);
+//        a[1] = (byte)((w[start+j] >> 16) & 0xff);
+//        a[2] = (byte)((w[start+j] >> 8) & 0xff);
+//        a[3] = (byte)(w[start+j] & 0xff);
         for(int i = 0; i < 4; i++){
-            state[i*4+j] ^= a[i];
+            state[i*4+j] ^= (byte)(w[start+j] >> (24-i*8));
         }
     }
 }
@@ -134,18 +140,26 @@ void AES::addRoundKey(byte *state, int start)
  */
 void AES::SubBytes(byte *state)
 {
+    uint8_t high;
+    uint8_t low;
     for(int i = 0; i < 4; i++){
         for(int j = 0; j < 4; j++){
-            state[i*4+j] = SubByte(state[i*4+j]);
+            high = state[i*4+j] >> 4;
+            low = state[i*4+j] & 0x0f;
+            state[i*4+j] = SBox[high][low];
         }
     }
 }
 // 逆字节替换
 void AES::SubBytes1(byte *state)
 {
+    uint8_t high;
+    uint8_t low;
     for(int i = 0; i < 4; i++){
         for(int j = 0; j < 4; j++){
-            state[4*i+j] = SubByte1(state[4*i+j]);
+            high = state[4*i+j] >> 4;
+            low = state[4*i+j] & 0x0f;
+            state[4*i+j] = SBoxInv[high][low];
         }
     }
 }
@@ -155,11 +169,20 @@ void AES::SubBytes1(byte *state)
 void AES::ShiftRows(byte *state)
 {
     for(int i = 0; i < 4; i++){
-        word t = Manager::Word(state[4*i+0], state[4*i+1], state[4*i+2], state[4*i+3]);
 
-        RotWord(t, i);
+        word ta = (word)state[4*i+0] << 24;
+        word tb = (word)state[4*i+1] << 16;
+        word tc = (word)state[4*i+2] << 8;
+        word td = (word)state[4*i+3];
 
-        Manager::slip(t, state[4*i+0], state[4*i+1], state[4*i+2], state[4*i+3]);
+        word t = ta | tb | tc | td;
+
+        t = RotWord(t, i);
+
+        state[4*i+0] = (byte)((t >> 24) & 0xff);
+        state[4*i+1] = (byte)((t >> 16) & 0xff);
+        state[4*i+2] = (byte)((t >> 8) & 0xff);
+        state[4*i+3] = (byte)(t & 0xff);
     }
 }
 /*
@@ -168,11 +191,20 @@ void AES::ShiftRows(byte *state)
 void AES::ShiftRows1(byte *state)
 {
     for(int i = 0; i < 4; i++){
-        word t = Manager::Word(state[4*i+0], state[4*i+1], state[4*i+2], state[4*i+3]);
+        word ta = (word)state[4*i+0] << 24;
+        word tb = (word)state[4*i+1] << 16;
+        word tc = (word)state[4*i+2] << 8;
+        word td = (word)state[4*i+3];
 
-        RotWord1(t, i);
+        word t = ta | tb | tc | td;
 
-        Manager::slip(t, state[4*i+0], state[4*i+1], state[4*i+2], state[4*i+3]);
+        t = RotWord1(t, i);
+
+        state[4*i+0] = (byte)((t >> 24) & 0xff);
+        state[4*i+1] = (byte)((t >> 16) & 0xff);
+        state[4*i+2] = (byte)((t >> 8) & 0xff);
+        state[4*i+3] = (byte)(t & 0xff);
+
     }
 }
 /*
@@ -207,6 +239,7 @@ void AES::MixColumns1(byte *state)
         state[4*3+j] = mul(0x0B, temp[4*0+j]) ^ mul(0x0D, temp[4*1+j]) ^ mul(0x09, temp[4*2+j]) ^ mul(0x0E, temp[4*3+j]);
     }
 }
+
 // TODO GF(2^8)上的乘法 (难点)
 //byte AES::mul(byte a, byte b)
 //{
@@ -225,6 +258,11 @@ void AES::MixColumns1(byte *state)
 //    }
 //    return p;
 //}
+
+
+
+
+
 byte AES::GFMul2(byte s) {
     byte result = s << 1;
     byte a7 = result & 0x0100;
@@ -272,25 +310,25 @@ byte AES::GFMul14(byte s) {
 /**
  * GF上的二元运算
  */
-byte AES::mul(byte n, byte s) {
-    byte result;
+//byte AES::mul(byte n, byte s) {
+//    byte result;
 
-    if(n == 1)
-        result = s;
-    else if(n == 2)
-        result = GFMul2(s);
-    else if(n == 3)
-        result = GFMul3(s);
-    else if(n == 0x9)
-        result = GFMul9(s);
-    else if(n == 0xb)//11
-        result = GFMul11(s);
-    else if(n == 0xd)//13
-        result = GFMul13(s);
-    else if(n == 0xe)//14
-        result = GFMul14(s);
+//    if(n == 1)
+//        result = s;
+//    else if(n == 2)
+//        result = GFMul2(s);
+//    else if(n == 3)
+//        result = GFMul3(s);
+//    else if(n == 0x9)
+//        result = GFMul9(s);
+//    else if(n == 0xb)//11
+//        result = GFMul11(s);
+//    else if(n == 0xd)//13
+//        result = GFMul13(s);
+//    else if(n == 0xe)//14
+//        result = GFMul14(s);
 
-    return result;
-}
+//    return result;
+//}
 
 

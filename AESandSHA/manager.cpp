@@ -6,6 +6,7 @@ Manager::Manager()
 }
 // 静态变量必须要这样告诉编译器申请了空间
 QString Manager::filepath = "";
+QString Manager::savepath = "";
 byte Manager::key[16] = {};
 byte* Manager::data = nullptr;
 int Manager::dataSize = 0;

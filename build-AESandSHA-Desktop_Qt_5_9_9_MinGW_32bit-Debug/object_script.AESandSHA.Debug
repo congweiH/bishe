@@ -8,6 +8,7 @@ INPUT(
 ./debug\manager.o
 ./debug\mode.o
 ./debug\sha.o
+./debug\qrc_res.o
 ./debug\moc_cryption.o
 ./debug\moc_dethread.o
 ./debug\moc_enthread.o
