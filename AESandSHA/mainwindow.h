@@ -38,14 +38,7 @@ public:
 
     QString passwd;
 
-    // 检查口令是否合法
-    bool checkPasswd();
-
     void setPasswd();
-
-    void getMode();
-    // 加密解密之前的工作
-    void init();
 
     void valueChanged(double value);
 private slots:

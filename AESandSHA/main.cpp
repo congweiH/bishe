@@ -8,8 +8,5 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-    qint8 b = 4;
-    qDebug() << b;
-
     return a.exec();
 }

@@ -6,9 +6,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setFixedSize(this->width(), this->height());
     // 添加图标
     setWindowIcon(QIcon(":/Encryption.ico"));
-
+    setWindowTitle("加密系统");
 
     // 程序已启动，加密和解密按钮都不能按，因为这个时候没有选择文件和口令
     ui->pB_decryption->setDisabled(true);
@@ -36,34 +37,6 @@ MainWindow::~MainWindow()
     delete deThread;
     delete ui;
 }
-
-bool MainWindow::checkPasswd()
-{
-    QFile file(Manager::filepath);
-    file.open(QFile::ReadOnly);
-    if(file.isOpen()){
-        // 这里读第一行就可以了
-        QByteArray cont = file.readLine();
-        // 读取密码
-        byte p[16];
-        for(int i = 0; i < 16; i++){
-            p[i] = (byte)cont[i];
-        }
-        file.close();
-
-        // 判断和用户输入的是否一致
-        for(int i = 0; i < 16; i++){
-            if(Manager::key[i] != p[i]){
-                return false;
-            }
-        }
-        return true;
-    }else{
-        qDebug() << Manager::filepath << "打开失败";
-        return false;
-    }
-}
-
 void MainWindow::setPasswd()
 {
     // 说明用的是文件
@@ -79,31 +52,6 @@ void MainWindow::setPasswd()
     qDebug() << passwd;
 }
 
-void MainWindow::getMode()
-{
-    QFile file(Manager::filepath);
-    file.open(QFile::ReadOnly);
-    if(file.isOpen()){
-        QByteArray cont = file.readLine();
-        Manager::mode = ((byte)cont[16]);
-        file.close();
-    }else{
-        qDebug() << Manager::filepath << "打开失败";
-    }
-    qDebug() << Manager::mode;
-}
-
-void MainWindow::init()
-{
-
-    setPasswd();
-
-    word res[5];
-    sha.sha1(passwd, res);
-
-    // 设置密钥
-    Manager::setKey(res);
-}
 /*
  * 选择加密文件
  */
@@ -120,10 +68,16 @@ void MainWindow::on_pB_selectfile_clicked()
  */
 void MainWindow::on_pB_encryption_clicked()
 {
-    init();
+    setPasswd();
+
+    word res[5];
+    sha.sha1(passwd, res);
+
+    // 设置密钥
+    Manager::setKey(res);
 
     if(passwd == ""){
-        QMessageBox::warning(this, "错误", "密码错误");
+        QMessageBox::warning(this, "错误", "密码不能为空");
         return;
     }
     // 设置模式
@@ -147,7 +101,6 @@ void MainWindow::on_pB_encryption_clicked()
         ui->pB_cancle->setDisabled(true);
 
         enThread->quit();
-
     });
 }
 /*
@@ -155,16 +108,21 @@ void MainWindow::on_pB_encryption_clicked()
  */
 void MainWindow::on_pB_decryption_clicked()
 {
-    init();
+    setPasswd();
 
-    if(checkPasswd()==false || passwd == ""){
-        QMessageBox::warning(this, "错误", "密码错误");
+    word res[5];
+    sha.sha1(passwd, res);
+
+    // 设置密钥
+    Manager::setKey(res);
+
+    if(passwd == ""){
+        QMessageBox::warning(this, "错误", "密码不能为空");
         return;
     }
 
-    getMode();
-
-    ui->cB_mode->setCurrentIndex(Manager::mode);
+    // 设置模式
+    Manager::mode = ui->cB_mode->currentIndex();
 
     ui->statusbar->showMessage("解密中...");
     // 解密
@@ -191,6 +149,10 @@ void MainWindow::on_pB_decryption_clicked()
 
 void MainWindow::on_lineEdit_filepath_editingFinished()
 {
+    // 进度条变成0
+    ui->progressBar->setValue(0);
+
+
     // 设置文件路径   加入到全局配置
     Manager::filepath = ui->lineEdit_filepath->text();
     QFileInfo fileinfo = QFileInfo(Manager::filepath);
@@ -204,11 +166,11 @@ void MainWindow::on_lineEdit_filepath_editingFinished()
 
         // 如果是一个加密文件
         if(fileinfo.suffix().contains(Manager::addSuffix)){
-            ui->cB_mode->setDisabled(true);
+//            ui->cB_mode->setDisabled(true);
             ui->pB_encryption->setDisabled(true);
             ui->pB_decryption->setDisabled(false);
         }else{
-            ui->cB_mode->setDisabled(false);
+//            ui->cB_mode->setDisabled(false);
             ui->pB_encryption->setDisabled(false);
             ui->pB_decryption->setDisabled(true);
         }

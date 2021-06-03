@@ -70,7 +70,7 @@ word AES::RotWord1(word t, int n)
 /*
  * 加密一组的过程
  */
-void AES::block_en(byte state[16])
+void AES::block_en(byte *state)
 {
     //  轮密钥加 w[0, 3]
     addRoundKey(state, 0);

@@ -76,7 +76,7 @@ public:
         groupBox_2->setGeometry(QRect(20, 120, 671, 241));
         pB_savepasswd = new QPushButton(groupBox_2);
         pB_savepasswd->setObjectName(QStringLiteral("pB_savepasswd"));
-        pB_savepasswd->setGeometry(QRect(540, 200, 111, 28));
+        pB_savepasswd->setGeometry(QRect(520, 200, 131, 28));
         pB_passwdfile = new QPushButton(groupBox_2);
         pB_passwdfile->setObjectName(QStringLiteral("pB_passwdfile"));
         pB_passwdfile->setGeometry(QRect(160, 30, 111, 28));
@@ -121,8 +121,8 @@ public:
         groupBox->setTitle(QApplication::translate("MainWindow", "\346\226\207\344\273\266", Q_NULLPTR));
         pB_selectfile->setText(QApplication::translate("MainWindow", "\351\200\211\346\213\251\346\226\207\344\273\266", Q_NULLPTR));
         groupBox_2->setTitle(QApplication::translate("MainWindow", "\345\217\243\344\273\244", Q_NULLPTR));
-        pB_savepasswd->setText(QApplication::translate("MainWindow", "\344\277\235\345\255\230\345\210\260\346\226\207\344\273\266\344\270\255", Q_NULLPTR));
-        pB_passwdfile->setText(QApplication::translate("MainWindow", "\351\200\211\346\213\251\345\212\240\345\257\206\346\226\207\344\273\266", Q_NULLPTR));
+        pB_savepasswd->setText(QApplication::translate("MainWindow", "\344\277\235\345\255\230\345\217\243\344\273\244\345\210\260\346\226\207\344\273\266\344\270\255", Q_NULLPTR));
+        pB_passwdfile->setText(QApplication::translate("MainWindow", "\351\200\211\346\213\251\345\257\206\351\222\245\346\226\207\344\273\266", Q_NULLPTR));
         cB_usepasswdfile->setText(QApplication::translate("MainWindow", "\344\275\277\347\224\250\345\212\240\345\257\206\346\226\207\344\273\266", Q_NULLPTR));
         groupBox_3->setTitle(QApplication::translate("MainWindow", "\346\250\241\345\274\217", Q_NULLPTR));
         cB_mode->clear();

@@ -29,12 +29,12 @@ void Cryption::encryption()
     QFile savefile(Manager::savepath);
     savefile.open(QFile::WriteOnly);
     QDataStream out(&savefile);
-    // 写密码, 占16个字节
-    for(int i = 0; i < 16; i++){
-        out << (qint8)Manager::key[i];
-    }
-    // 写模式，占一个字节
-    out << (qint8)Manager::mode;
+//    // 写密码, 占16个字节
+//    for(int i = 0; i < 16; i++){
+//        out << (qint8)Manager::key[i];
+//    }
+//    // 写模式，占一个字节
+//    out << (qint8)Manager::mode;
 
     // 求填充长度
     Manager::addSize = 16 - readfile.size() % 16;
@@ -103,10 +103,8 @@ void Cryption::decryption()
 
     // 读取填充长度
     char * sizebuffer=new char[1];
-    for(int i = 0; i < 18; i++){
-        readfile.read(sizebuffer, 1);
-        Manager::addSize = ((byte)sizebuffer[0]);
-    }
+    readfile.read(sizebuffer, 1);
+    Manager::addSize = ((byte)sizebuffer[0]);
     delete []sizebuffer;
 
     QFileInfo fileInfo = QFileInfo(Manager::filepath);

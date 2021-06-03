@@ -2,12 +2,12 @@
 
 Mode::Mode(QObject *parent): QObject(parent)
 {
-    // 密钥扩展
-    aes.keyExpansion();
+
 }
 
 void Mode::ECB_en()
 {
+    aes.keyExpansion();
     for(int r = 0; r < Manager::dataSize; r += 16){
         aes.block_en(Manager::data+r);
     }
@@ -15,6 +15,7 @@ void Mode::ECB_en()
 
 void Mode::ECB_de()
 {
+    aes.keyExpansion();
     for(int r = 0; r < Manager::dataSize; r += 16){
         // 解密一组
         aes.block_de(Manager::data+r);
@@ -23,6 +24,7 @@ void Mode::ECB_de()
 
 void Mode::CBC_en()
 {
+    aes.keyExpansion();
     byte IV[16] = {0x54, 0x34, 0x56, 0xf4, 0x34, 0x45, 0xa2, 0xd3, 0x78, 0x95, 0xab, 0xca, 0xcd, 0xdb, 0xde, 0xde};
     for(int r = 0; r < Manager::dataSize; r+=16){
 
@@ -39,6 +41,7 @@ void Mode::CBC_en()
 
 void Mode::CBC_de()
 {
+    aes.keyExpansion();
     byte IV[16] = {0x54, 0x34, 0x56, 0xf4, 0x34, 0x45, 0xa2, 0xd3, 0x78, 0x95, 0xab, 0xca, 0xcd, 0xdb, 0xde, 0xde};
     byte temp[16];
     for(int r = 0; r < Manager::dataSize; r += 16){
@@ -60,6 +63,7 @@ void Mode::CBC_de()
 
 void Mode::CFB_en()
 {
+    aes.keyExpansion();
     byte IV[16] = {0x54, 0x34, 0x56, 0xf4, 0x34, 0x45, 0xa2, 0xd3, 0x78, 0x95, 0xab, 0xca, 0xcd, 0xdb, 0xde, 0xde};
     for(int r = 0; r < Manager::dataSize; r+=16){
 
@@ -74,6 +78,7 @@ void Mode::CFB_en()
 
 void Mode::CFB_de()
 {
+    aes.keyExpansion();
     byte IV[16] = {0x54, 0x34, 0x56, 0xf4, 0x34, 0x45, 0xa2, 0xd3, 0x78, 0x95, 0xab, 0xca, 0xcd, 0xdb, 0xde, 0xde};
     byte temp[16];
     for(int r = 0; r < Manager::dataSize; r += 16){
@@ -91,6 +96,7 @@ void Mode::CFB_de()
 
 void Mode::OFB_en()
 {
+    aes.keyExpansion();
     byte IV[16] = {0x54, 0x34, 0x56, 0xf4, 0x34, 0x45, 0xa2, 0xd3, 0x78, 0x95, 0xab, 0xca, 0xcd, 0xdb, 0xde, 0xde};
     for(int r = 0; r < Manager::dataSize; r+=16){
 
@@ -104,6 +110,7 @@ void Mode::OFB_en()
 
 void Mode::OFB_de()
 {
+    aes.keyExpansion();
     byte IV[16] = {0x54, 0x34, 0x56, 0xf4, 0x34, 0x45, 0xa2, 0xd3, 0x78, 0x95, 0xab, 0xca, 0xcd, 0xdb, 0xde, 0xde};
     for(int r = 0; r < Manager::dataSize; r += 16){
 
@@ -119,6 +126,7 @@ void Mode::OFB_de()
 
 void Mode::CTR_en()
 {
+    aes.keyExpansion();
     byte IV[16] = {0x54, 0x34, 0x56, 0xf4, 0x34, 0x45, 0xa2, 0xd3, 0x78, 0x95, 0xab, 0xca, 0xcd, 0xdb, 0xde, 0xde};
     for(int r = 0; r < Manager::dataSize; r+=16){
 
@@ -135,6 +143,7 @@ void Mode::CTR_en()
 
 void Mode::CTR_de()
 {
+    aes.keyExpansion();
     byte IV[16] = {0x54, 0x34, 0x56, 0xf4, 0x34, 0x45, 0xa2, 0xd3, 0x78, 0x95, 0xab, 0xca, 0xcd, 0xdb, 0xde, 0xde};
     for(int r = 0; r < Manager::dataSize; r += 16){
 
